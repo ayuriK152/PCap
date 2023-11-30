@@ -71,12 +71,12 @@ namespace HTTP
         {
             var rawPacket = e.GetPacket();
             var packet = PacketDotNet.Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
-            /*var dhcp = packet.Extract<PacketDotNet.Http>();*/
-            var ip = packet.Extract<PacketDotNet.IPPacket>();
-            var tcp = packet.Extract<PacketDotNet.TcpPacket>();
 
-            Console.WriteLine("");
-            Console.WriteLine(packet);
+            byte[] buffByte = new byte[rawPacket.Data.Length - 54];
+            Buffer.BlockCopy(rawPacket.Data, 54, buffByte, 0, rawPacket.Data.Length - 54);
+            Console.WriteLine($"{packet}\n\n");
+            Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffByte));
+
             /*Console.WriteLine("============IP Packet============");
             Console.WriteLine("Src: {0} / Dst: {1} / TTL: {2}", ip.SourceAddress, ip.DestinationAddress, ip.TimeToLive);
             Console.WriteLine("============TCP Packet============");
