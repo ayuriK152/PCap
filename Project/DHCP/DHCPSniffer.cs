@@ -93,14 +93,11 @@ namespace DHCP
             if (dhcp.MessageType.ToString() == "Request")
             {
                 Console.WriteLine("Client ID: " + dhcp.GetOptions()[1]);
-                Console.WriteLine("Requested IP address: " + dhcp.GetOptions()[2]);
                 Console.WriteLine("HostName: " + dhcp.GetOptions()[3]);
             }
             if (dhcp.MessageType.ToString() == "Ack")
             {
                 Console.WriteLine("Server ID: " + dhcp.GetOptions()[1]);
-                Console.WriteLine("SubnetMask: " + dhcp.GetOptions()[3]);
-                Console.WriteLine("Router: " + dhcp.GetOptions()[4]);
             }
             Console.WriteLine("===================================");
         }

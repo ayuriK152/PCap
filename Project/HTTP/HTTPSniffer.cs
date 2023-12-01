@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using SharpPcap;
 
 namespace HTTP
@@ -48,7 +49,7 @@ namespace HTTP
             int readTimeoutMilliseconds = 1000;
             device.Open(DeviceModes.Promiscuous, readTimeoutMilliseconds);
 
-            string filter = "tcp src port 80";
+            string filter = "tcp dst port 80 or tcp src port 80";
             device.Filter = filter;
 
             Console.WriteLine();
@@ -72,32 +73,23 @@ namespace HTTP
             var rawPacket = e.GetPacket();
             var packet = PacketDotNet.Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
 
-            byte[] buffByte = new byte[rawPacket.Data.Length - 54];
-            Buffer.BlockCopy(rawPacket.Data, 54, buffByte, 0, rawPacket.Data.Length - 54);
-            Console.WriteLine($"{packet}\n\n");
-            Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffByte));
+            var ip = packet.Extract<PacketDotNet.IPPacket>();
+            var tcp = packet.Extract<PacketDotNet.TcpPacket>();
 
-            /*Console.WriteLine("============IP Packet============");
-            Console.WriteLine("Src: {0} / Dst: {1} / TTL: {2}", ip.SourceAddress, ip.DestinationAddress, ip.TimeToLive);
-            Console.WriteLine("============TCP Packet============");
-            Console.WriteLine("Src Port: {0} / Dst Port: {1}", tcp.SourcePort, tcp.DestinationPort);
-            Console.WriteLine("============DHCP Packet============");
-            Console.WriteLine("Your IP address: " + dhcp.YourAddress);
-            Console.WriteLine("Your MAC address: " + dhcp.ClientHardwareAddress);
-            Console.WriteLine("DHCP MessageType: " + dhcp.MessageType);
-            if (dhcp.MessageType.ToString() == "Request")
-            {
-                Console.WriteLine("Client ID: " + dhcp.GetOptions()[1]);
-                Console.WriteLine("Requested IP address: " + dhcp.GetOptions()[2]);
-                Console.WriteLine("HostName: " + dhcp.GetOptions()[3]);
-            }
-            if (dhcp.MessageType.ToString() == "Ack")
-            {
-                Console.WriteLine("Server ID: " + dhcp.GetOptions()[1]);
-                Console.WriteLine("SubnetMask: " + dhcp.GetOptions()[3]);
-                Console.WriteLine("Router: " + dhcp.GetOptions()[4]);
-            }*/
-            Console.WriteLine("===================================");
+            
+
+                Console.WriteLine("============IP Packet============");
+                Console.WriteLine("Src: {0} / Dst: {1} / TTL: {2}", ip.SourceAddress, ip.DestinationAddress, ip.TimeToLive);
+                Console.WriteLine("============TCP Packet============");
+                Console.WriteLine("Src Port: {0} / Dst Port: {1}", tcp.SourcePort, tcp.DestinationPort);
+                Console.WriteLine("Flag: {0}", tcp.Flags.ToString());
+
+
+                                    Console.WriteLine("============HTTP Packet============");
+                                    byte[] buffByte = new byte[rawPacket.Data.Length - 54];
+                                    Buffer.BlockCopy(rawPacket.Data, 54, buffByte, 0, rawPacket.Data.Length - 54);
+                                    Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffByte));
+                Console.WriteLine("===================================");
         }
     }
 }
