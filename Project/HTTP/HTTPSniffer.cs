@@ -76,20 +76,27 @@ namespace HTTP
             var ip = packet.Extract<PacketDotNet.IPPacket>();
             var tcp = packet.Extract<PacketDotNet.TcpPacket>();
 
-            
+            Console.WriteLine("============IP Packet============");
+            Console.WriteLine("Src: {0} / Dst: {1} / TTL: {2}", ip.SourceAddress, ip.DestinationAddress, ip.TimeToLive);
+            Console.WriteLine("============TCP Packet============");
+            Console.WriteLine("Src Port: {0} / Dst Port: {1}", tcp.SourcePort, tcp.DestinationPort);
+            string signal = "";
+            if (tcp.Acknowledgment && tcp.Synchronize)
+                signal = "[ACK | SYN]";
+            else if (tcp.Acknowledgment)
+                signal = "[ACK]";
+            else if (tcp.Synchronize)
+                signal = "[SYN]";
 
-                Console.WriteLine("============IP Packet============");
-                Console.WriteLine("Src: {0} / Dst: {1} / TTL: {2}", ip.SourceAddress, ip.DestinationAddress, ip.TimeToLive);
-                Console.WriteLine("============TCP Packet============");
-                Console.WriteLine("Src Port: {0} / Dst Port: {1}", tcp.SourcePort, tcp.DestinationPort);
-                Console.WriteLine("Flag: {0}", tcp.Flags.ToString());
+            if (signal != "")
+                Console.WriteLine(signal);
+            Console.WriteLine("Flag: {0}", tcp.Flags.ToString());
 
-
-                                    Console.WriteLine("============HTTP Packet============");
-                                    byte[] buffByte = new byte[rawPacket.Data.Length - 54];
-                                    Buffer.BlockCopy(rawPacket.Data, 54, buffByte, 0, rawPacket.Data.Length - 54);
-                                    Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffByte));
-                Console.WriteLine("===================================");
+            Console.WriteLine("============HTTP Packet============");
+            byte[] buffByte = new byte[rawPacket.Data.Length - 54];
+            Buffer.BlockCopy(rawPacket.Data, 54, buffByte, 0, rawPacket.Data.Length - 54);
+            Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffByte));
+            Console.WriteLine("===================================\n");
         }
     }
 }
