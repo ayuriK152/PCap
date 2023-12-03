@@ -25,6 +25,8 @@ namespace HTTP
             Console.WriteLine("The following devices are available on this machine:");
             Console.WriteLine("----------------------------------------------------");
             Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
 
             int i = 0;
 
@@ -83,19 +85,27 @@ namespace HTTP
             string signal = "";
             if (tcp.Acknowledgment && tcp.Synchronize)
                 signal = "[ACK | SYN]";
-            else if (tcp.Acknowledgment)
-                signal = "[ACK]";
+            else if (tcp.Finished && tcp.Acknowledgment)
+                signal = "[ACK | FIN]";
             else if (tcp.Synchronize)
                 signal = "[SYN]";
+            else if (tcp.Finished)
+                signal = "[FIN]";
+            else if (tcp.Acknowledgment)
+                signal = "[ACK]";
 
             if (signal != "")
                 Console.WriteLine(signal);
             Console.WriteLine("Flag: {0}", tcp.Flags.ToString());
 
-            Console.WriteLine("============HTTP Packet============");
             byte[] buffByte = new byte[rawPacket.Data.Length - 54];
             Buffer.BlockCopy(rawPacket.Data, 54, buffByte, 0, rawPacket.Data.Length - 54);
-            Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffByte));
+            if (buffByte.Length > 0 && (buffByte[0] == 'G' || buffByte[0] == 'H'))
+            {
+                Console.WriteLine("============HTTP Packet============");
+                Console.WriteLine(System.Text.Encoding.UTF8.GetString(buffByte));
+
+            }
             Console.WriteLine("===================================\n");
         }
     }
